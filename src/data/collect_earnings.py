@@ -1,7 +1,9 @@
 """실적발표 공시 원문에서 순이익과 발표 시각을 뽑아 SUE(표준화 어닝 서프라이즈)를 계산한다.
 
-실행: .venv/bin/python src/data/collect_earnings.py   (collect_calendar.py를 먼저 실행)
-출력: data/earnings/fin_sue.csv  (실적발표 1건당 1행)
+실행: .venv/bin/python -m src.data.collect_earnings --industry finance   (collect_calendar를 먼저 실행)
+입력: data/<산업군>/calendar/earnings_calendar.csv, filing_times.csv(있으면)
+출력: data/<산업군>/earnings/sue.csv            실적발표 1건당 1행
+      data/<산업군>/earnings/parse_coverage.csv 종목별 순이익·SUE 추출 성공률
 
 재무제표 API 대신 공시 원문을 쓰는 이유:
 - 금융업은 2023년 3분기 이전 보고서가 재무제표 API(fnlttSinglAcntAll)에 없다
@@ -24,12 +26,11 @@ import numpy as np
 import pandas as pd
 import requests
 
-from collect_calendar import ANNUAL_KEYWORD, BASE_URL, ROOT, get_api_key
+from src.common import ANALYSIS_START, RAW_DIR, ROOT, cli_industry
+from src.data.collect_calendar import ANNUAL_KEYWORD, BASE_URL, get_api_key
 
-CALENDAR_PATH = ROOT / "data" / "calendar" / "fin_earnings_calendar.csv"
-OUT_PATH = ROOT / "data" / "earnings" / "fin_sue.csv"
-FILING_TIMES_PATH = ROOT / "data" / "calendar" / "fin_filing_times.csv"
-DOC_CACHE_DIR = ROOT / "data" / "raw" / "dart_docs"
+DOC_CACHE_DIR = RAW_DIR / "dart_docs"
+LOW_COVERAGE = 0.8  # 분석 기간 발표 중 순이익이 추출된 비율이 이보다 낮으면 경고한다
 
 UNIT_TO_WON = {"천원": 1e3, "백만원": 1e6, "억원": 1e8, "십억원": 1e9, "조원": 1e12, "원": 1.0}
 OWNERS_LABEL = "지배기업소유주지분순이익"
@@ -245,27 +246,49 @@ def add_sue(events):
     return events
 
 
-def main():
+def coverage_report(events):
+    """분석 기간 발표 중 순이익·SUE가 채워진 비율을 종목별로 정리한다."""
+    recent = events[events["announce_date"] >= ANALYSIS_START]
+    report = recent.groupby(["ticker", "name"]).agg(
+        n_events=("rcept_no", "size"),
+        net_income_ok=("net_income", lambda s: s.notna().mean()),
+        sue_ok=("sue", lambda s: s.notna().mean()),
+    ).reset_index()
+    return report
+
+
+def main(industry):
     api_key = get_api_key()
-    calendar = pd.read_csv(CALENDAR_PATH, dtype={"ticker": str, "rcept_no": str})
+    calendar = pd.read_csv(industry.path("calendar"), dtype={"ticker": str, "rcept_no": str})
     events = add_sue(build_events(api_key, calendar))
-    if FILING_TIMES_PATH.exists():
+    filing_times_path = industry.path("filing_times")
+    if filing_times_path.exists():
         # 공시 접수 시각(KIND)이 IR 예정 시각보다 정확하므로 timing을 덮어쓴다
-        filed = pd.read_csv(FILING_TIMES_PATH, dtype={"rcept_no": str})[["rcept_no", "filing_time", "timing"]]
+        filed = pd.read_csv(filing_times_path, dtype={"rcept_no": str})[["rcept_no", "filing_time", "timing"]]
         events = events.drop(columns="timing").merge(filed, on="rcept_no", how="left")
         events["timing"] = events["timing"].fillna("미확인")
 
     cols = ["ticker", "name", "sector", "fiscal_q", "announce_date", "ir_time", "filing_time", "timing",
             "net_income", "net_income_prev_year", "delta", "yoy_growth",
             "delta_std", "n_history", "sue", "basis", "rcept_no"]
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    events[cols].to_csv(OUT_PATH, index=False, encoding="utf-8-sig")
+    out_path = industry.path("sue")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    events[cols].to_csv(out_path, index=False, encoding="utf-8-sig")
 
-    print(f"저장: {OUT_PATH.relative_to(ROOT)} ({len(events)}행)")
+    coverage = coverage_report(events)
+    coverage.to_csv(industry.path("coverage"), index=False, encoding="utf-8-sig")
+
+    print(f"저장: {out_path.relative_to(ROOT)} ({len(events)}행)")
     print(f"  순이익 추출 {events['net_income'].notna().sum()}행, "
           f"SUE 계산 {events['sue'].notna().sum()}행, "
           f"공시 시각 확인 {(events['timing'] != '미확인').sum()}행")
+    low = coverage[coverage["net_income_ok"] < LOW_COVERAGE]
+    if not low.empty:
+        print(f"\n[경고] 분석 기간 순이익 추출률이 {LOW_COVERAGE:.0%} 미만인 종목 {len(low)}곳")
+        print("  공시 서식이 금융업과 달라 파서가 값을 못 읽었을 수 있습니다. 해당 공시 원문을 확인하세요")
+        print("  (원문 캐시: data/raw/dart_docs/<접수번호>.xml)")
+        print(low.to_string(index=False, float_format=lambda v: f"{v:.0%}"))
 
 
 if __name__ == "__main__":
-    main()
+    main(cli_industry(__doc__.splitlines()[0]))

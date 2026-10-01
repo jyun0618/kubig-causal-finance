@@ -1,7 +1,8 @@
-"""OpenDART에서 은행·증권·카드사의 실적발표(잠정실적 공정공시) 캘린더를 수집한다.
+"""OpenDART에서 산업군 종목들의 실적발표(잠정실적 공정공시) 캘린더를 수집한다.
 
-실행: .venv/bin/python src/data/collect_calendar.py
-출력: data/calendar/fin_earnings_calendar.csv
+실행: .venv/bin/python -m src.data.collect_calendar --industry finance
+입력: config/industries/<산업군>.csv
+출력: data/<산업군>/calendar/earnings_calendar.csv
 
 - 실적발표일 = '영업(잠정)실적(공정공시)' 공시의 접수일
   (4분기는 '매출액또는손익구조...변경' 공시로만 내는 회사가 많아 함께 수집)
@@ -17,44 +18,19 @@ import os
 import time
 import zipfile
 import xml.etree.ElementTree as ET
-from pathlib import Path
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT_PATH = ROOT / "data" / "calendar" / "fin_earnings_calendar.csv"
-CORP_CODE_CACHE = ROOT / "data" / "raw" / "dart_corp_codes.csv"
+from src.common import DART_BGN_DE, DART_END_DE, FIRST_QUARTER, RAW_DIR, ROOT, cli_industry
 
+CORP_CODE_CACHE = RAW_DIR / "dart_corp_codes.csv"
 BASE_URL = "https://opendart.fss.or.kr/api"
-BGN_DE = "20190101"
-END_DE = "20260930"
-
-UNIVERSE = {
-    "105560": ("KB금융", "bank"),
-    "055550": ("신한지주", "bank"),
-    "086790": ("하나금융지주", "bank"),
-    "316140": ("우리금융지주", "bank"),
-    "024110": ("기업은행", "bank"),
-    "138930": ("BNK금융지주", "bank"),
-    "139130": ("iM금융지주", "bank"),
-    "175330": ("JB금융지주", "bank"),
-    "323410": ("카카오뱅크", "bank"),
-    "006800": ("미래에셋증권", "securities"),
-    "071050": ("한국금융지주", "securities"),
-    "005940": ("NH투자증권", "securities"),
-    "016360": ("삼성증권", "securities"),
-    "039490": ("키움증권", "securities"),
-    "003540": ("대신증권", "securities"),
-    "138040": ("메리츠금융지주", "securities"),
-    "029780": ("삼성카드", "card"),
-}
 
 EARNINGS_KEYWORD = "영업(잠정)실적"
 ANNUAL_KEYWORD = "매출액또는손익구조"
 SUBSIDIARY_MARKER = "자회사의 주요경영사항"
-FIRST_QUARTER = "2019Q1"
 CORRECTION_MARKERS = ("정정", "추가", "연장")
 
 
@@ -98,8 +74,8 @@ def fetch_disclosures(api_key, corp_code):
         params = {
             "crtfc_key": api_key,
             "corp_code": corp_code,
-            "bgn_de": BGN_DE,
-            "end_de": END_DE,
+            "bgn_de": DART_BGN_DE,
+            "end_de": DART_END_DE,
             "pblntf_ty": "I",
             "page_no": page,
             "page_count": 100,
@@ -136,12 +112,17 @@ def classify(report_nm, date):
     return 1 if SUBSIDIARY_MARKER in report_nm else 0
 
 
-def main():
+def main(industry):
     api_key = get_api_key()
     corp_codes = load_corp_codes(api_key).set_index("stock_code")
 
+    unknown = [t for t, *_ in industry.rows() if t not in corp_codes.index]
+    if unknown:
+        raise SystemExit(f"DART 고유번호 목록에 없는 종목코드: {', '.join(unknown)}\n"
+                         "상장폐지 종목이거나 종목코드 오타입니다. 설정 파일을 확인하세요.")
+
     rows = []
-    for ticker, (name, sector) in UNIVERSE.items():
+    for ticker, name, sector, _ in industry.rows():
         corp_code = corp_codes.loc[ticker, "corp_code"]
         disclosures = fetch_disclosures(api_key, corp_code)
         n_before = len(rows)
@@ -178,10 +159,11 @@ def main():
 
     cols = ["ticker", "name", "sector", "fiscal_q", "announce_date",
             "announce_time", "timing", "source", "report_nm", "rcept_no", "n_candidates"]
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df[cols].to_csv(OUT_PATH, index=False, encoding="utf-8-sig")
-    print(f"\n저장: {OUT_PATH.relative_to(ROOT)} ({len(df)}행)")
+    out_path = industry.path("calendar")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    df[cols].to_csv(out_path, index=False, encoding="utf-8-sig")
+    print(f"\n저장: {out_path.relative_to(ROOT)} ({len(df)}행)")
 
 
 if __name__ == "__main__":
-    main()
+    main(cli_industry(__doc__.splitlines()[0]))

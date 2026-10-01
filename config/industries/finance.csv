@@ -1,0 +1,21 @@
+# 산업군: 금융 (은행·증권·카드)
+# ticker: 6자리 종목코드 / name: 표시용 이름 / sector: 매칭·DiD에서 같은 업종으로 묶는 단위
+# market: KOSPI 또는 KOSDAQ (시장모형의 벤치마크 지수를 정한다. 비우면 KOSPI)
+ticker,name,sector,market
+105560,KB금융,bank,KOSPI
+055550,신한지주,bank,KOSPI
+086790,하나금융지주,bank,KOSPI
+316140,우리금융지주,bank,KOSPI
+024110,기업은행,bank,KOSPI
+138930,BNK금융지주,bank,KOSPI
+139130,iM금융지주,bank,KOSPI
+175330,JB금융지주,bank,KOSPI
+323410,카카오뱅크,bank,KOSPI
+006800,미래에셋증권,securities,KOSPI
+071050,한국금융지주,securities,KOSPI
+005940,NH투자증권,securities,KOSPI
+016360,삼성증권,securities,KOSPI
+039490,키움증권,securities,KOSPI
+003540,대신증권,securities,KOSPI
+138040,메리츠금융지주,securities,KOSPI
+029780,삼성카드,card,KOSPI

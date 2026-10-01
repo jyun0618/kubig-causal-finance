@@ -1,7 +1,8 @@
 """KIND(한국거래소 공시 시스템)에서 실적발표 공시의 실제 접수 시각을 수집한다.
 
-실행: .venv/bin/python src/data/collect_filing_times.py   (collect_calendar.py를 먼저 실행)
-출력: data/calendar/fin_filing_times.csv
+실행: .venv/bin/python -m src.data.collect_filing_times --industry finance   (collect_calendar를 먼저 실행)
+입력: data/<산업군>/calendar/earnings_calendar.csv
+출력: data/<산업군>/calendar/filing_times.csv
 
 - OpenDART API에는 접수 일자만 있고 시각이 없어서 KIND 공시 목록에서 시각을 가져온다
 - 캘린더의 (종목, 접수일, 공시 제목)과 같은 KIND 공시를 찾고, 같은 제목이 여러 건이면 가장 이른 시각을 쓴다
@@ -18,11 +19,9 @@ import time
 import pandas as pd
 import requests
 
-from collect_calendar import ROOT
+from src.common import RAW_DIR, ROOT, cli_industry
 
-CALENDAR_PATH = ROOT / "data" / "calendar" / "fin_earnings_calendar.csv"
-OUT_PATH = ROOT / "data" / "calendar" / "fin_filing_times.csv"
-CACHE_DIR = ROOT / "data" / "raw" / "kind"
+CACHE_DIR = RAW_DIR / "kind"
 
 KIND_URL = "https://kind.krx.co.kr/disclosure/details.do"
 HEADERS = {
@@ -75,8 +74,8 @@ def to_timing(clock):
     return "마감직전" if minutes < MARKET_CLOSE else "장후"
 
 
-def main():
-    calendar = pd.read_csv(CALENDAR_PATH, dtype={"ticker": str, "rcept_no": str})
+def main(industry):
+    calendar = pd.read_csv(industry.path("calendar"), dtype={"ticker": str, "rcept_no": str})
     records = []
     for row in calendar.itertuples():
         filings = fetch_day(row.ticker, row.announce_date)
@@ -91,11 +90,12 @@ def main():
         })
 
     out = pd.DataFrame(records)
-    OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    out.to_csv(OUT_PATH, index=False, encoding="utf-8-sig")
-    print(f"저장: {OUT_PATH.relative_to(ROOT)} ({len(out)}행)")
+    out_path = industry.path("filing_times")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_csv(out_path, index=False, encoding="utf-8-sig")
+    print(f"저장: {out_path.relative_to(ROOT)} ({len(out)}행)")
     print(out["timing"].value_counts().to_string())
 
 
 if __name__ == "__main__":
-    main()
+    main(cli_industry(__doc__.splitlines()[0]))

@@ -1,11 +1,12 @@
-"""은행·증권 실적발표 DiD 파일럿: 통제군 매칭 + 이중차분 추정 + 검증.
+"""실적발표 DiD 파일럿: 통제군 매칭 + 이중차분 추정 + 검증.
 
-실행: .venv/bin/python src/did/run_did.py   (build_event_windows.py 이후)
-출력:
-  data/results/did_summary.csv       설계·섹터·결과변수별 추정치 요약
-  data/results/did_event_study.csv   상대일별 이벤트스터디 계수
-  data/results/did_events.csv        사건 단위 DiD 값 (재분석용)
-  data/results/did_balance.csv       매칭 전후 공변량 균형
+실행: .venv/bin/python -m src.did.run_did --industry finance   (build_event_windows 이후)
+업종(sector)별로 설계 A·B를 돌린다. 사건이 있는 기업이 MIN_FIRMS곳 미만인 업종은 건너뛴다.
+출력 (data/<산업군>/results/):
+  did_summary.csv       설계·업종·결과변수별 추정치 요약
+  did_event_study.csv   상대일별 이벤트스터디 계수
+  did_events.csv        사건 단위 DiD 값 (재분석용)
+  did_balance.csv       매칭 전후 공변량 균형
 
 설계 A (발표 시점): 처치 = 어떤 분기에 발표한 기업, 통제 = 같은 업종·같은 분기에서 처치 t0보다
   GAP_DAYS 거래일 이상 뒤에 발표하는 기업(not-yet-treated). 규모·변동성·SUE가 가까운 K_CONTROLS곳을 고른다
@@ -21,13 +22,13 @@ DiD 추정: 사건 단위로 [(처치 post−pre) − (통제 post−pre 평균)
 """
 
 import itertools
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parents[2]
-OUT_DIR = ROOT / "data" / "results"
+from src.common import ROOT, cli_industry
+
+MIN_FIRMS = 4
 
 PRE, POST = 5, 3
 EST_START, EST_END = -65, -6
@@ -42,17 +43,18 @@ RELS = np.arange(-PRE, POST + 1)
 
 
 class Data:
-    def __init__(self):
-        prices = pd.read_csv(ROOT / "data/prices/fin_prices.csv", parse_dates=["date"], dtype={"ticker": str})
+    def __init__(self, industry):
+        prices = pd.read_csv(industry.path("prices"), parse_dates=["date"], dtype={"ticker": str})
         self.days = pd.DatetimeIndex(sorted(prices["date"].unique()))
         wide = lambda col: prices.pivot(index="date", columns="ticker", values=col).reindex(self.days)
         self.ret = {t: v.to_numpy() for t, v in wide("ret").items()}
         self.logvol = {t: np.log(v.to_numpy()) for t, v in wide("volume").items()}
         self.mcap = {t: v.to_numpy() for t, v in wide("market_cap").items()}
-        kospi = pd.read_csv(ROOT / "data/prices/kospi.csv", parse_dates=["date"]).set_index("date")
-        self.mkt = kospi["kospi_ret"].reindex(self.days).to_numpy()
+        index = pd.read_csv(industry.path("index"), parse_dates=["date"]).set_index("date")
+        market_ret = {m: index[f"{m.lower()}_ret"].reindex(self.days).to_numpy() for m in industry.universe["market"].unique()}
+        self.mkt = {t: market_ret[m] for t, m in zip(industry.universe["ticker"], industry.universe["market"])}
 
-        ev = pd.read_csv(ROOT / "data/events/fin_events.csv", parse_dates=["t0_date"], dtype={"ticker": str})
+        ev = pd.read_csv(industry.path("events"), parse_dates=["t0_date"], dtype={"ticker": str})
         ev["i"] = self.days.searchsorted(ev["t0_date"])
         self.ev = ev
 
@@ -72,7 +74,7 @@ def path(D, ticker, i, est_i, shift=0, alpha=None, beta=None):
     idx = i + shift + RELS
     r = D.ret[ticker][idx]
     if alpha is not None:
-        r = r - alpha - beta * D.mkt[idx]
+        r = r - alpha - beta * D.mkt[ticker][idx]
     base = np.nanmean(D.logvol[ticker][window(est_i)])
     return {"ret": r, "abs_ret": np.abs(r), "abn_vol": D.logvol[ticker][idx] - base}
 
@@ -225,11 +227,20 @@ def balance_table(bal, label):
     return rows
 
 
-def main():
-    D = Data()
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    runs = [(("A", s), design_a(D, s)) for s in ("securities", "bank")]
-    runs += [((f"B_{c}", s), design_b(D, s, c)) for s in ("bank", "securities") for c in ("high", "low")]
+def main(industry):
+    D = Data(industry)
+    out_dir = industry.results_dir
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    n_firms = D.ev.groupby("sector")["ticker"].nunique()
+    sectors = sorted(n_firms[n_firms >= MIN_FIRMS].index)
+    skipped = sorted(set(n_firms.index) - set(sectors))
+    if skipped:
+        print(f"기업 수가 {MIN_FIRMS}곳 미만이라 건너뛴 업종: {', '.join(skipped)}")
+    if not sectors:
+        raise SystemExit("DiD를 돌릴 수 있는 업종이 없습니다 (업종당 사건이 있는 기업이 4곳 이상 필요).")
+    runs = [(("A", s), design_a(D, s)) for s in sectors]
+    runs += [((f"B_{c}", s), design_b(D, s, c)) for s in sectors for c in ("high", "low")]
 
     summary, es, events, balance = [], [], [], []
     for label, (df, bal) in runs:
@@ -240,12 +251,14 @@ def main():
         balance += balance_table(bal, label)
         events.append(df)
 
-    pd.DataFrame(summary).to_csv(OUT_DIR / "did_summary.csv", index=False, encoding="utf-8-sig")
-    pd.DataFrame(es).to_csv(OUT_DIR / "did_event_study.csv", index=False, encoding="utf-8-sig")
-    pd.DataFrame(balance).to_csv(OUT_DIR / "did_balance.csv", index=False, encoding="utf-8-sig")
-    pd.concat(events).to_csv(OUT_DIR / "did_events.csv", index=False, encoding="utf-8-sig")
-    print(f"저장: data/results/ (설계 {len(runs)}개)")
+    if not events:
+        raise SystemExit("추정 가능한 사건이 없습니다. 매칭 조건(통제군 후보)이나 SUE 결측을 확인하세요.")
+    pd.DataFrame(summary).to_csv(out_dir / "did_summary.csv", index=False, encoding="utf-8-sig")
+    pd.DataFrame(es).to_csv(out_dir / "did_event_study.csv", index=False, encoding="utf-8-sig")
+    pd.DataFrame(balance).to_csv(out_dir / "did_balance.csv", index=False, encoding="utf-8-sig")
+    pd.concat(events).to_csv(out_dir / "did_events.csv", index=False, encoding="utf-8-sig")
+    print(f"저장: {out_dir.relative_to(ROOT)}/ (설계 {len(runs)}개 중 추정 {len(events)}개)")
 
 
 if __name__ == "__main__":
-    main()
+    main(cli_industry(__doc__.splitlines()[0]))
