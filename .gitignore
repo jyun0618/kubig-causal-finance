@@ -9,3 +9,7 @@ __pycache__/
 
 # 수집 캐시
 data/raw/
+
+# 개인 메모 (저장소에 올리지 않음)
+plans/
+history/
