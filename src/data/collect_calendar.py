@@ -28,7 +28,7 @@ OUT_PATH = ROOT / "data" / "calendar" / "fin_earnings_calendar.csv"
 CORP_CODE_CACHE = ROOT / "data" / "raw" / "dart_corp_codes.csv"
 
 BASE_URL = "https://opendart.fss.or.kr/api"
-BGN_DE = "20210101"
+BGN_DE = "20190101"
 END_DE = "20260930"
 
 UNIVERSE = {
@@ -54,7 +54,7 @@ UNIVERSE = {
 EARNINGS_KEYWORD = "영업(잠정)실적"
 ANNUAL_KEYWORD = "매출액또는손익구조"
 SUBSIDIARY_MARKER = "자회사의 주요경영사항"
-FIRST_QUARTER = "2021Q1"
+FIRST_QUARTER = "2019Q1"
 CORRECTION_MARKERS = ("정정", "추가", "연장")
 
 
