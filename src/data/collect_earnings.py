@@ -28,6 +28,7 @@ from collect_calendar import ANNUAL_KEYWORD, BASE_URL, ROOT, get_api_key
 
 CALENDAR_PATH = ROOT / "data" / "calendar" / "fin_earnings_calendar.csv"
 OUT_PATH = ROOT / "data" / "earnings" / "fin_sue.csv"
+FILING_TIMES_PATH = ROOT / "data" / "calendar" / "fin_filing_times.csv"
 DOC_CACHE_DIR = ROOT / "data" / "raw" / "dart_docs"
 
 UNIT_TO_WON = {"천원": 1e3, "백만원": 1e6, "억원": 1e8, "십억원": 1e9, "조원": 1e12, "원": 1.0}
@@ -248,8 +249,13 @@ def main():
     api_key = get_api_key()
     calendar = pd.read_csv(CALENDAR_PATH, dtype={"ticker": str, "rcept_no": str})
     events = add_sue(build_events(api_key, calendar))
+    if FILING_TIMES_PATH.exists():
+        # 공시 접수 시각(KIND)이 IR 예정 시각보다 정확하므로 timing을 덮어쓴다
+        filed = pd.read_csv(FILING_TIMES_PATH, dtype={"rcept_no": str})[["rcept_no", "filing_time", "timing"]]
+        events = events.drop(columns="timing").merge(filed, on="rcept_no", how="left")
+        events["timing"] = events["timing"].fillna("미확인")
 
-    cols = ["ticker", "name", "sector", "fiscal_q", "announce_date", "ir_time", "timing",
+    cols = ["ticker", "name", "sector", "fiscal_q", "announce_date", "ir_time", "filing_time", "timing",
             "net_income", "net_income_prev_year", "delta", "yoy_growth",
             "delta_std", "n_history", "sue", "basis", "rcept_no"]
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -258,7 +264,7 @@ def main():
     print(f"저장: {OUT_PATH.relative_to(ROOT)} ({len(events)}행)")
     print(f"  순이익 추출 {events['net_income'].notna().sum()}행, "
           f"SUE 계산 {events['sue'].notna().sum()}행, "
-          f"발표 시각 확인 {(events['timing'] != '미확인').sum()}행")
+          f"공시 시각 확인 {(events['timing'] != '미확인').sum()}행")
 
 
 if __name__ == "__main__":
