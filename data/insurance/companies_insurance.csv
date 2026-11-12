@@ -1,0 +1,24 @@
+ticker,name,subgroup
+TRV,Travelers,large_multiline
+CB,Chubb,large_multiline
+AIG,American International Group,large_multiline
+HIG,Hartford Financial,large_multiline
+CNA,CNA Financial,large_multiline
+CINF,Cincinnati Financial,large_multiline
+ALL,Allstate,personal_lines
+MCY,Mercury General,personal_lines
+KMPR,Kemper,personal_lines
+HCI,HCI Group,personal_lines
+WRB,W. R. Berkley,specialty_reins
+MKL,Markel,specialty_reins
+ACGL,Arch Capital,specialty_reins
+AXS,Axis Capital,specialty_reins
+KNSL,Kinsale Capital,specialty_reins
+RLI,RLI Corp,specialty_reins
+SIGI,Selective Insurance,specialty_reins
+AFG,American Financial Group,specialty_reins
+THG,Hanover Insurance,specialty_reins
+ORI,Old Republic,specialty_reins
+PLMR,Palomar,specialty_reins
+RNR,RenaissanceRe,specialty_reins
+EG,Everest Group,specialty_reins
