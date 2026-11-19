@@ -1,0 +1,8 @@
+# 교란 이벤트. main_exclude=1: 메인에서 제외 / 0: 메인 포함, 강건성에서만 제외 (2026-11-12 뉴스 확인)
+industry,ticker,announce_date,main_exclude,reason
+bio,LLY,2025-08-07,1,경구 비만약 orforglipron 3상(ATTAIN-1) 결과 동시 발표
+bio,VRTX,2025-08-04,1,VX-993 2상 실패·개발 중단 동시 공시
+bio,LLY,2025-05-01,1,같은 날 CVS Caremark가 Zepbound를 우대 목록에서 제외 발표
+bio,CRL,2025-05-07,1,같은 날 Elliott 협력 합의·전략 검토·이사회 교체 발표
+bio,WAT,2026-02-09,0,같은 날 BD 사업부 인수 완료. 하락은 인수 사업 포함 가이던스 탓
+bio,VRTX,2025-05-05,0,실적 미스가 주원인이나 VX-522 임상 일부 중단도 같이 공시

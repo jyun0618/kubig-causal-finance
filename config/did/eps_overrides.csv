@@ -1,0 +1,29 @@
+# yfinance 실제 EPS에 GAAP 값이 섞인 이벤트를 보도자료(SEC 8-K Exhibit 99.1)의 조정 EPS로 바꾼다.
+# 찾는 방법: yfinance 값이 SEC XBRL 분기 GAAP 희석 EPS와 같은 분기 + EPS 의심 플래그 → 보도자료 확인 (2026-11-12)
+# eps_adjusted가 비어 있으면 결측 처리(점수 계산에서 제외)
+industry,ticker,announce_date,eps_yf,eps_adjusted,adjusted_label,note
+insurance,TRV,2024-10-17,5.42,5.24,Core income per diluted share,
+insurance,AIG,2024-05-01,1.74,1.77,AATI per diluted share,
+insurance,AIG,2024-11-04,0.71,1.23,AATI per diluted share,
+insurance,AIG,2025-05-01,1.16,1.17,AATI per diluted share,
+insurance,AIG,2025-08-06,1.98,1.81,AATI per diluted share,
+insurance,HIG,2025-10-27,3.77,3.78,Core earnings per diluted share,
+insurance,CINF,2024-10-24,5.20,1.42,Non-GAAP operating income per share,
+insurance,ALL,2025-02-05,7.07,7.67,Adjusted net income per diluted share,
+insurance,ALL,2025-07-30,7.76,5.94,Adjusted net income per diluted share,
+insurance,ALL,2025-11-05,13.95,11.17,Adjusted net income per diluted share,
+insurance,ALL,2026-02-04,14.37,14.31,Adjusted net income per diluted share,
+insurance,KMPR,2025-08-05,1.12,1.30,Adjusted consolidated net operating income per diluted share,
+insurance,HCI,2024-03-07,3.40,3.22,Adjusted net income per diluted share,2025Q2부터 HCI는 조정 EPS를 발표하지 않아 GAAP 유지
+insurance,HCI,2025-02-27,0.23,0.31,Adjusted net income per diluted share,
+insurance,WRB,2024-10-21,0.91,0.93,Operating income per diluted share,분할 반영값
+insurance,ACGL,2024-10-30,2.56,1.99,After-tax operating income per share,
+insurance,AXS,2024-01-31,2.94,-1.25,Operating loss per diluted share,yfinance는 사전 공시된 준비금 손실을 뺀 underlying 값. 컨센서스는 손실 포함 기준
+insurance,AXS,2026-04-29,3.29,3.42,Operating income per diluted share,
+insurance,SIGI,2022-05-04,0.89,1.41,Non-GAAP operating income per diluted share,
+insurance,AFG,2025-05-06,1.84,1.81,Core net operating earnings per share,
+insurance,ORI,2026-01-22,0.82,0.74,Net operating income per diluted share,
+insurance,ORI,2026-04-23,1.32,0.68,Net operating income per diluted share,
+insurance,RNR,2024-11-06,22.62,10.23,Operating income per diluted common share,
+insurance,EG,2025-10-27,6.09,7.54,Operating income per diluted share,
+insurance,MKL,2021-04-28,42.02,,,당시 조정 EPS 미발표. 투자이익 포함 GAAP 값이라 결측 처리

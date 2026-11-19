@@ -1,3 +1,9 @@
 requests
 pandas
+numpy
+matplotlib
 yfinance
+
+# DiD 추정 (src/did_us/estimate.py)
+# Python 3.9에서는 pyfixest==0.25.4 (그 이후 버전은 3.10 이상 필요). Colab 등 3.10 이상은 최신 버전
+pyfixest
