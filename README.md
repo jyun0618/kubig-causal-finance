@@ -46,7 +46,6 @@ KUBIG 26-2 컨퍼런스 프로젝트 — **기업 실적발표(어닝 서프라�
 ```
 src/did_us/     세 산업 공통 DiD 파이프라인 (데이터 → 이벤트 테이블 → 추정 → 저장)
 config/did/     산업별 표본 기업과 보정 파일 (EPS · 반응일 · 교란 이벤트)
-data/insurance/ 보험 실적 교차검증 데이터 (정리 후 삭제 예정)
 data/raw/us/    yfinance 수집 캐시 (저장소에 올리지 않음, 실행 시 자동 생성)
 output/<산업>/  파이프라인 결과 (이벤트 테이블 · 추정 결과 · 그림)
 notebook/       분석 노트북 (아래 표)
@@ -57,9 +56,8 @@ memory/         설계 결정과 그 근거
 | 노트북 | 역할 |
 |---|---|
 | `did_common.ipynb` | **메인.** 세 산업 공통 DiD 분석과 산업 비교 |
-| `insurance_data_collect.ipynb` | 보험 실적 교차검증 (Alpha Vantage vs yfinance) → `data/insurance/`. 차이를 `config/did/`에 반영한 뒤 삭제 예정 |
 
-통일 전 산업별 파일럿 노트북은 삭제했습니다. `git checkout pilots-final -- notebook/<파일명>`으로 하나씩 꺼내 볼 수 있습니다 (폴더째 꺼내면 다른 노트북이 옛 버전으로 덮어써지므로 파일명을 지정).
+통일 전 산업별 파일럿 노트북은 삭제했습니다. `git checkout pilots-final -- notebook/<파일명>`으로 하나씩 꺼내 볼 수 있습니다 (폴더째 꺼내면 다른 노트북이 옛 버전으로 덮어써지므로 파일명을 지정). 산업별 데이터 수집 노트북(IT·보험)도 같은 이유로 삭제했으며, 같은 태그에서 꺼낼 수 있습니다.
 
 실행 방법은 [docs/guides/pipeline-reproduction.md](docs/guides/pipeline-reproduction.md)를 참고하세요.
 
