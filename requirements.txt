@@ -1,6 +1,3 @@
 requests
 pandas
-python-dotenv
-pykrx
 yfinance
-finance-datareader
