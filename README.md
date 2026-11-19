@@ -57,7 +57,8 @@ memory/         설계 결정과 그 근거
 |---|---|
 | `did_common.ipynb` | **메인.** 세 산업 공통 DiD 분석과 산업 비교 |
 | `it_data_collect.ipynb`, `insurance_data_collect.ipynb` | 산업별 데이터 수집 → `data/<산업>/` |
-| `IT_pilot_revised.ipynb`, `bio_pilot_final.ipynb`, `보험_산업군_파일럿_미국PC23.ipynb` | 통일 전 산업별 파일럿 (참고용) |
+
+통일 전 산업별 파일럿 노트북은 삭제했습니다. `git checkout pilots-final -- notebook/`으로 꺼내 볼 수 있습니다.
 
 실행 방법은 [docs/guides/pipeline-reproduction.md](docs/guides/pipeline-reproduction.md)를 참고하세요.
 
