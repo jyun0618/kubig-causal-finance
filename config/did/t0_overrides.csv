@@ -1,5 +1,6 @@
 # yfinance 발표일·시각이 틀린 이벤트. SEC 8-K Item 2.02 접수 시각과 주가 반응으로 확인 (2026-11-12)
 # ORI는 8-K가 보도자료보다 늦게 접수되는 회사라 yfinance를 그대로 쓴다. MKL은 10-Q 접수 시각으로 확인(일치).
+# (2026-11-19) Alpha Vantage와 날짜가 다른 AXS 2026-07-28 · EG 2023-05-01 · ORI 2026-07-22는 8-K 접수 시각으로 yfinance가 맞음을 확인. THG 2023-10-18은 3분기 잠정실적 8-K(영업 EPS $0.19 공개)라 정식 발표일(11-01)이 아닌 yfinance 날짜를 유지한다.
 industry,ticker,yf_datetime,announce_datetime,timing,t0,evidence
 bio,AMGN,2022-04-27 12:00,2022-04-27 16:19,AMC,2022-04-28,8-K 16:19 / AR t+1 -6.8%p
 bio,IQV,2023-11-01 16:00,2023-11-01 07:05,BMO,2023-11-01,8-K 07:05 / AR t0 +3.9%p
