@@ -1,0 +1,202 @@
+## baseline: 기준 모형: HBR 미포함 (원값 SUE 기준 RQ1)
+CAR ~ Beat + S_beat + S_miss + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Beat          |      2.040 |        0.915 |     2.230 |      0.029 |  0.215 |   3.864 |
+| S_beat        |      3.903 |        0.962 |     4.057 |      0.000 |  1.984 |   5.822 |
+| S_miss        |      2.479 |        1.514 |     1.638 |      0.106 | -0.541 |   5.499 |
+| hist_sd       |     -0.437 |        0.858 |    -0.509 |      0.612 | -2.149 |   1.274 |
+| pre_car       |     -0.016 |        0.082 |    -0.194 |      0.847 | -0.179 |   0.147 |
+| log_dvol      |     -0.214 |        0.202 |    -1.060 |      0.293 | -0.618 |   0.189 |
+---
+RMSE: 7.215 R2: 0.112 R2 Within: 0.064 
+
+
+## main: 메인: 연속 HBR
+CAR ~ Beat + S_beat + S_miss + HBR_beat + HBR_miss + Sb_HBR + Sm_HBR + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Beat          |      2.374 |        1.008 |     2.357 |      0.021 |   0.364 |   4.384 |
+| S_beat        |      4.315 |        1.244 |     3.468 |      0.001 |   1.833 |   6.796 |
+| S_miss        |      1.040 |        1.877 |     0.554 |      0.581 |  -2.705 |   4.785 |
+| HBR_beat      |     -6.730 |        2.938 |    -2.291 |      0.025 | -12.590 |  -0.869 |
+| HBR_miss      |     -3.786 |        2.947 |    -1.285 |      0.203 |  -9.665 |   2.092 |
+| Sb_HBR        |      1.738 |        2.804 |     0.620 |      0.537 |  -3.855 |   7.331 |
+| Sm_HBR        |     -5.152 |        3.300 |    -1.561 |      0.123 | -11.735 |   1.431 |
+| hist_sd       |     -1.494 |        0.958 |    -1.559 |      0.124 |  -3.404 |   0.417 |
+| pre_car       |     -0.020 |        0.080 |    -0.252 |      0.802 |  -0.179 |   0.139 |
+| log_dvol      |     -0.265 |        0.184 |    -1.442 |      0.154 |  -0.633 |   0.102 |
+---
+RMSE: 7.16 R2: 0.125 R2 Within: 0.078 
+
+
+## rob_zpast: 강건성: 서프라이즈를 z_past로
+CAR ~ Beat + S_beat + S_miss + HBR_beat + HBR_miss + Sb_HBR + Sm_HBR + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Beat          |     -0.298 |        1.425 |    -0.209 |      0.835 | -3.141 |   2.545 |
+| S_beat        |      1.648 |        0.281 |     5.866 |      0.000 |  1.088 |   2.209 |
+| S_miss        |      2.206 |        0.650 |     3.392 |      0.001 |  0.909 |   3.504 |
+| HBR_beat      |     -4.034 |        2.639 |    -1.529 |      0.131 | -9.298 |   1.229 |
+| HBR_miss      |      6.310 |        2.920 |     2.161 |      0.034 |  0.484 |  12.136 |
+| Sb_HBR        |      0.964 |        1.698 |     0.568 |      0.572 | -2.423 |   4.351 |
+| Sm_HBR        |      1.359 |        1.073 |     1.267 |      0.209 | -0.781 |   3.499 |
+| hist_sd       |      0.734 |        0.618 |     1.188 |      0.239 | -0.498 |   1.967 |
+| pre_car       |     -0.000 |        0.077 |    -0.005 |      0.996 | -0.153 |   0.152 |
+| log_dvol      |     -0.258 |        0.200 |    -1.289 |      0.202 | -0.657 |   0.141 |
+---
+RMSE: 7.029 R2: 0.157 R2 Within: 0.111 
+
+
+## rob_bins: 강건성: HBR 구간형 (기준 0~6회)
+CAR ~ Beat + S_beat + S_miss + HBR7_beat + HBR7_miss + Sb_HBR7 + Sm_HBR7 + HBR8_beat + HBR8_miss + Sb_HBR8 + Sm_HBR8 + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Beat          |      2.193 |        1.291 |     1.698 |      0.094 |  -0.383 |   4.770 |
+| S_beat        |      3.717 |        0.736 |     5.052 |      0.000 |   2.249 |   5.185 |
+| S_miss        |      2.815 |        1.629 |     1.728 |      0.088 |  -0.434 |   6.064 |
+| HBR7_beat     |     -1.786 |        0.814 |    -2.194 |      0.032 |  -3.410 |  -0.162 |
+| HBR7_miss     |     -1.105 |        1.194 |    -0.925 |      0.358 |  -3.486 |   1.277 |
+| Sb_HBR7       |      1.464 |        1.809 |     0.809 |      0.421 |  -2.144 |   5.072 |
+| Sm_HBR7       |     -1.655 |        2.043 |    -0.810 |      0.421 |  -5.731 |   2.421 |
+| HBR8_beat     |     -2.250 |        0.768 |    -2.931 |      0.005 |  -3.781 |  -0.718 |
+| HBR8_miss     |     -3.380 |        3.031 |    -1.115 |      0.269 |  -9.426 |   2.666 |
+| Sb_HBR8       |      0.266 |        1.108 |     0.240 |      0.811 |  -1.945 |   2.477 |
+| Sm_HBR8       |      6.905 |       11.337 |     0.609 |      0.545 | -15.712 |  29.521 |
+| hist_sd       |     -1.212 |        0.926 |    -1.309 |      0.195 |  -3.059 |   0.635 |
+| pre_car       |     -0.016 |        0.082 |    -0.198 |      0.844 |  -0.180 |   0.148 |
+| log_dvol      |     -0.291 |        0.184 |    -1.584 |      0.118 |  -0.657 |   0.076 |
+---
+RMSE: 7.158 R2: 0.126 R2 Within: 0.078 
+
+
+## rob_firmfe: 강건성: 기업 FE 추가
+CAR ~ Beat + S_beat + S_miss + HBR_beat + HBR_miss + Sb_HBR + Sm_HBR + hist_sd + pre_car + log_dvol | industry^quarter + ticker
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter+ticker
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Beat          |      2.261 |        1.053 |     2.147 |      0.035 |   0.161 |   4.361 |
+| S_beat        |      4.274 |        1.217 |     3.511 |      0.001 |   1.846 |   6.703 |
+| S_miss        |      1.018 |        1.863 |     0.546 |      0.587 |  -2.698 |   4.734 |
+| HBR_beat      |     -2.903 |        2.228 |    -1.303 |      0.197 |  -7.347 |   1.541 |
+| HBR_miss      |     -2.213 |        3.763 |    -0.588 |      0.558 |  -9.720 |   5.294 |
+| Sb_HBR        |      0.690 |        2.527 |     0.273 |      0.786 |  -4.352 |   5.732 |
+| Sm_HBR        |     -2.904 |        4.101 |    -0.708 |      0.481 | -11.085 |   5.278 |
+| hist_sd       |      0.599 |        1.708 |     0.351 |      0.727 |  -2.807 |   4.006 |
+| pre_car       |      0.015 |        0.080 |     0.188 |      0.852 |  -0.145 |   0.175 |
+| log_dvol      |     -3.483 |        0.824 |    -4.227 |      0.000 |  -5.126 |  -1.839 |
+---
+RMSE: 6.893 R2: 0.189 R2 Within: 0.083 
+
+
+## rob_meet_as_miss: 강건성: 일치를 하회에 포함
+CAR ~ Beat + S_beat + S_miss + HBR_beat + HBR_miss + Sb_HBR + Sm_HBR + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1318
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Beat          |      1.875 |        0.785 |     2.389 |      0.020 |   0.310 |   3.441 |
+| S_beat        |      4.280 |        1.202 |     3.562 |      0.001 |   1.882 |   6.677 |
+| S_miss        |      1.567 |        1.738 |     0.902 |      0.370 |  -1.900 |   5.035 |
+| HBR_beat      |     -6.727 |        2.967 |    -2.268 |      0.026 | -12.645 |  -0.809 |
+| HBR_miss      |     -1.937 |        2.194 |    -0.883 |      0.381 |  -6.314 |   2.441 |
+| Sb_HBR        |      1.663 |        2.804 |     0.593 |      0.555 |  -3.931 |   7.257 |
+| Sm_HBR        |     -3.526 |        3.716 |    -0.949 |      0.346 | -10.939 |   3.887 |
+| hist_sd       |     -1.542 |        0.896 |    -1.721 |      0.090 |  -3.330 |   0.245 |
+| pre_car       |     -0.033 |        0.076 |    -0.435 |      0.665 |  -0.186 |   0.119 |
+| log_dvol      |     -0.297 |        0.174 |    -1.707 |      0.092 |  -0.644 |   0.050 |
+---
+RMSE: 7.191 R2: 0.125 R2 Within: 0.075 
+
+
+## rob_streak: H2-C: HBR 대신 StreakNorm
+CAR ~ Beat + S_beat + S_miss + Streak_beat + Streak_miss + Sb_Streak + Sm_Streak + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |   2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|-------:|--------:|
+| Beat          |      2.761 |        1.082 |     2.551 |      0.013 |  0.602 |   4.921 |
+| S_beat        |      4.133 |        1.024 |     4.036 |      0.000 |  2.090 |   6.175 |
+| S_miss        |      2.666 |        2.260 |     1.180 |      0.242 | -1.843 |   7.174 |
+| Streak_beat   |     -1.778 |        0.816 |    -2.178 |      0.033 | -3.406 |  -0.150 |
+| Streak_miss   |     -4.012 |        1.958 |    -2.049 |      0.044 | -7.918 |  -0.106 |
+| Sb_Streak     |     -0.249 |        1.795 |    -0.139 |      0.890 | -3.830 |   3.333 |
+| Sm_Streak     |     -0.326 |        3.696 |    -0.088 |      0.930 | -7.700 |   7.048 |
+| hist_sd       |     -1.081 |        0.911 |    -1.187 |      0.239 | -2.898 |   0.736 |
+| pre_car       |     -0.010 |        0.082 |    -0.121 |      0.904 | -0.174 |   0.154 |
+| log_dvol      |     -0.240 |        0.195 |    -1.232 |      0.222 | -0.628 |   0.149 |
+---
+RMSE: 7.174 R2: 0.122 R2 Within: 0.074 
+
+
+## rob_hbr_streak: H2-C: HBR과 StreakNorm 동시 투입
+CAR ~ Beat + S_beat + S_miss + HBR_beat + HBR_miss + Sb_HBR + Sm_HBR + Streak_beat + Streak_miss + Sb_Streak + Sm_Streak + hist_sd + pre_car + log_dvol | industry^quarter
+###
+
+Estimation:  OLS
+Dep. var.: CAR, Fixed effects: industry^quarter
+Inference:  CRV1
+Observations:  1274
+
+| Coefficient   |   Estimate |   Std. Error |   t value |   Pr(>|t|) |    2.5% |   97.5% |
+|:--------------|-----------:|-------------:|----------:|-----------:|--------:|--------:|
+| Beat          |      2.761 |        1.080 |     2.556 |      0.013 |   0.606 |   4.915 |
+| S_beat        |      4.327 |        1.218 |     3.552 |      0.001 |   1.897 |   6.757 |
+| S_miss        |      2.141 |        2.382 |     0.899 |      0.372 |  -2.612 |   6.893 |
+| HBR_beat      |     -7.753 |        4.715 |    -1.644 |      0.105 | -17.159 |   1.653 |
+| HBR_miss      |      1.576 |        2.256 |     0.699 |      0.487 |  -2.924 |   6.077 |
+| Sb_HBR        |      3.114 |        4.019 |     0.775 |      0.441 |  -4.905 |  11.132 |
+| Sm_HBR        |     -4.615 |        4.169 |    -1.107 |      0.272 | -12.933 |   3.703 |
+| Streak_beat   |      0.595 |        1.256 |     0.474 |      0.637 |  -1.910 |   3.101 |
+| Streak_miss   |     -4.865 |        2.036 |    -2.390 |      0.020 |  -8.926 |  -0.804 |
+| Sb_Streak     |     -1.197 |        2.504 |    -0.478 |      0.634 |  -6.193 |   3.799 |
+| Sm_Streak     |      1.467 |        4.640 |     0.316 |      0.753 |  -7.789 |  10.723 |
+| hist_sd       |     -1.472 |        0.943 |    -1.560 |      0.123 |  -3.353 |   0.410 |
+| pre_car       |     -0.014 |        0.081 |    -0.170 |      0.865 |  -0.176 |   0.149 |
+| log_dvol      |     -0.262 |        0.187 |    -1.403 |      0.165 |  -0.634 |   0.110 |
+---
+RMSE: 7.141 R2: 0.13 R2 Within: 0.083 
